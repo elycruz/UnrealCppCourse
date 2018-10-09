@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "OpenDoor.h"
 #include "Gameframework/Actor.h"
+#include "Gameframework/PlayerController.h"
+#include "Runtime/Engine/Classes/Engine/World.h"
 #include "Core/Public/Math/Rotator.h"
-
 
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
@@ -12,8 +12,6 @@ UOpenDoor::UOpenDoor()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 
@@ -22,12 +20,29 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Get `DoorOpener`
+	UWorld* World = GetWorld();
+	PlayerPawn = World->GetFirstPlayerController()->GetPawn();
+}
+
+void UOpenDoor::OpenDoor()
+{
 	// Get Rotator
 	AActor* Owner = GetOwner();
 	FRotator Rotator = Owner->GetTransform().Rotator();
-	
+
 	// Increment Rotator
 	Rotator.Add(0.0f, 90.0f, 0.0f);
+
+	// Update Rotator on owner
+	Owner->SetActorRotation(Rotator);
+}
+
+void UOpenDoor::CloseDoor()
+{
+	// Get Rotator
+	AActor* Owner = GetOwner();
+	FRotator Rotator = FRotator(0.0f, 0.0f, 0.0f);
 
 	// Update Rotator on owner
 	Owner->SetActorRotation(Rotator);
@@ -39,6 +54,16 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	// Poll trigger volume
+	if (!doorOpened && PressurePlate->IsOverlappingActor(PlayerPawn)) {
+		OpenDoor();
+		doorOpened = true;
+	} else if (doorOpened) {
+		CloseDoor();
+		doorOpened = false;
+	}
+
+
+
 }
 
