@@ -29,10 +29,7 @@ void UOpenDoor::OpenDoor()
 {
 	// Get Rotator
 	AActor* Owner = GetOwner();
-	FRotator Rotator = Owner->GetTransform().Rotator();
-
-	// Increment Rotator
-	Rotator.Add(0.0f, 90.0f, 0.0f);
+	FRotator Rotator = FRotator(0.0f, 90.0f, 0.0f);
 
 	// Update Rotator on owner
 	Owner->SetActorRotation(Rotator);
@@ -53,17 +50,22 @@ void UOpenDoor::CloseDoor()
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	float currTime = GetWorld()->TimeSeconds;
+	bool onPressurePlate = PressurePlate->IsOverlappingActor(PlayerPawn);
+	bool passedDoorCloseDelay = currTime + DoorCloseDelay > LastOpenTime;
 
-	// Poll trigger volume
-	if (!doorOpened && PressurePlate->IsOverlappingActor(PlayerPawn)) {
+	// If door closed and 'on pressure plate'
+	if (!doorOpened && onPressurePlate) {
 		OpenDoor();
+		LastOpenTime = currTime;
 		doorOpened = true;
-	} else if (doorOpened) {
+	}  
+
+	// Else if close door condition
+	else if (doorOpened && !onPressurePlate && passedDoorCloseDelay) {
 		CloseDoor();
 		doorOpened = false;
 	}
-
-
 
 }
 

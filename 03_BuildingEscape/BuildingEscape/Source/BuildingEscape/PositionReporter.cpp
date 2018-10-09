@@ -2,7 +2,6 @@
 
 #include "PositionReporter.h"
 #include "Gameframework/Actor.h"
-#include <iostream>
 #include <string>
 
 // Sets default values for this component's properties
