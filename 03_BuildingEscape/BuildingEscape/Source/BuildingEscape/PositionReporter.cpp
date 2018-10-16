@@ -32,11 +32,6 @@ void UPositionReporter::BeginPlay()
 	// Simple logging with unreal
 	UE_LOG(LogTemp, Warning, 
 		TEXT("Position report for %s;\nLocation: %s"), *ObjectName, *ObjectPos);
-
-
-
-	// ...
-	
 }
 
 
@@ -45,6 +40,5 @@ void UPositionReporter::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
 }
 
